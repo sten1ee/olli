@@ -1,4 +1,4 @@
-package olli;
+package com.sten1ee.olli;
 
 import java.io.IOException;
 

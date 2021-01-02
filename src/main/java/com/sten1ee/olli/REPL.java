@@ -1,4 +1,5 @@
-package olli;
+//#!/usr/bin/env java --source 11
+package com.sten1ee.olli;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

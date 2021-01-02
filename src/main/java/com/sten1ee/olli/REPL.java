@@ -714,10 +714,10 @@ class SexpParser extends SexpLexer {
         if (tokenType == NUM)
             return getNum();
 
-        if (tokenType == '(')
+        if (tokenType == LPA)
             return parseList();
 
-        if (tokenType == '\'') {
+        if (tokenType == QUO) {
             scanNextToken();
             return new Pair(PredefSymbol.QUOTE, new Pair(parseObj(), NIL));
         }
@@ -727,19 +727,19 @@ class SexpParser extends SexpLexer {
     }
 
     private Sexp  parseList() {
-        assert tokenType == '(';
+        assert tokenType == LPA;
 
         Sexp head = NIL;
         Pair tail = null;
         while (scanNextToken() != EOF) {
-            if (tokenType == ')')
+            if (tokenType == RPA)
                 return head;
 
-            if (tokenType == '.') {
+            if (tokenType == DOT) {
                 scanNextToken();
                 if (tail == null)
                     head = tail = new Pair(head, NIL);
-                if (tokenType == ')')
+                if (tokenType == RPA)
                     return head;
                 tail.rest = parseObj();
                 tail = null;
@@ -769,7 +769,7 @@ class SexpParser extends SexpLexer {
 
 public class REPL {
 
-    static final String version = "0.1";
+    static final String version = "1.0.1";
 
     static void  testParseAndPrint(String source) {
         new SexpLexer(source).listAllTokens(System.err);

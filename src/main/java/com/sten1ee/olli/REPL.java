@@ -275,13 +275,38 @@ class Num extends Atom {
     }
 
     @Override
-    Sexp eval(Env env) {
+    Num eval(Env env) {
         return this;
     }
 
     @Override
     void appendTo(Appendable sb) throws IOException {
         sb.append(String.valueOf(val));
+    }
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class Str extends Atom {
+    final String val;
+    final String rawVal; // non-null for Str literals
+
+    private Str(String val, String rawVal) {
+        this.val = val;
+        this.rawVal = rawVal;
+    }
+
+    static Str  make(String val, String rawVal) {
+        return new Str(val, rawVal);
+    }
+
+    @Override
+    Str eval(Env env) {
+        return this;
+    }
+
+    @Override
+    void appendTo(Appendable sb) throws IOException {
+        sb.append(val);
     }
 }
 
@@ -527,6 +552,7 @@ class TopEnv extends HashMapEnv {
 class SexpLexer {
     private static final String  strPattern =
                        "(-?[0-9]+[.]?[0-9]*([eE][+-]?[0-9]+)?)(?=[ \\t\\n;()])"
+                    +  "|(\"([^\n\"\\\\]|\\\\[^\n])*[\n\"])"
                     +  "|(?<![0-9])[a-zA-Z_#!?+*/%<>=-][a-zA-Z0-9_#!?+*/%<>=-]*"
                     +  "|[().'\\n]"     // treat \n as separate token, as Lexer needs them for line counting
                     +  "|([ \\t]+|;[^\n]*)+"  // (white-space or comment)+
@@ -542,17 +568,79 @@ class SexpLexer {
     private int     line;
     private int     tokenBeg, tokenEnd;
 
-    //int  tokenType() {
-    //    return tokenType;
-    //}
+    int  line() {
+        return line;
+    }
 
-    protected String  getRawToken() {
+    private String  getRawToken() {
         return matcher.group();
     }
 
     protected Num  getNum() {
         assert tokenType == NUM : (char)tokenType;
         return Num.make(Double.parseDouble(matcher.group()));
+    }
+
+    protected Str  getStr() {
+        assert tokenType == STR : (char) tokenType;
+        String rawToken = getRawToken();
+        assert rawToken.startsWith("\"") : rawToken;
+        assert rawToken.length() >= 2 : rawToken;
+        if (rawToken.endsWith("\n")) {
+            error(line, "Unterminated Str literal");
+            rawToken = rawToken.substring(0, rawToken.length() - 1) + '\"';
+        }
+        assert rawToken.endsWith("\"") : rawToken;
+
+        String rawVal = rawToken.substring(1, rawToken.length() - 1);
+        String val = rawValToVal(rawVal);
+        return Str.make(val, rawVal);
+    }
+
+    private String  rawValToVal(String rawVal) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < rawVal.length(); ) {
+            char c = rawVal.charAt(i++);
+            if (c == '\\') {
+                // escape sequence
+                switch (c = rawVal.charAt(i++)) {
+                    case '"':
+                    case '\\':
+                        break;
+
+                    case 'r':
+                        c = '\r';
+                        break;
+                    case 'n':
+                        c = '\n';
+                        break;
+                    case 't':
+                        c = '\t';
+                        break;
+                    case 'f':
+                        c = '\f';
+                        break;
+                    case 'b':
+                        c = '\b';
+                        break;
+
+                    case 'x':
+                        assert i + 2 <= rawVal.length() : rawVal;
+                        c = (char) Integer.parseInt(rawVal.substring(i, i += 2), 16);
+                        break;
+
+                    case 'u':
+                        assert i + 4 <= rawVal.length() : rawVal;
+                        c = (char) Integer.parseInt(rawVal.substring(i, i += 4), 16);
+                        break;
+
+                    default:
+                        error("Unexpected escape sequence in Str: " + rawVal.substring(i - 2));
+                }
+            }
+            sb.append(c);
+        }
+        return sb.toString();
     }
 
     protected Symbol  getSymbol() {
@@ -601,7 +689,7 @@ class SexpLexer {
         this.source = source;
         this.predefSymbols = predefSymbols;
         this.errStream = errStream;
-        line = 1;
+        line = 0;
         matcher = pattern.matcher(source);
     }
 
@@ -611,6 +699,7 @@ class SexpLexer {
 
     protected static final int
             NUM = '1',
+            STR = '"',
             SYM = 'a',
             LPA = '(',
             RPA = ')',
@@ -645,6 +734,9 @@ class SexpLexer {
                     case '.':
                     case '\'':
                         return tokenType = c;
+
+                    case '"':
+                        return tokenType = STR;
 
                     case '0':case '1':case '2':case '3':case '4':
                     case '5':case '6':case '7':case '8':case '9':
@@ -713,6 +805,9 @@ class SexpParser extends SexpLexer {
 
         if (tokenType == NUM)
             return getNum();
+
+        if (tokenType == STR)
+            return getStr();
 
         if (tokenType == LPA)
             return parseList();
@@ -786,10 +881,10 @@ public class REPL {
         System.out.println("Welcome to Olli's Read-Eval-Print-Loop");
         while (true) {
             try {
-                System.out.print("?< ");
+                System.out.print("<< ");
                 Sexp inExp = parser.parse();
                 Sexp resExp = inExp.eval(topEnv);
-                System.out.println("=> " + resExp);
+                System.out.println("[" + parser.line() +  "] => " + resExp);
             }
             catch (EvalError ee) {
                 System.out.println("## " + ee.getMessage());

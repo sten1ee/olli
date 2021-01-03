@@ -271,16 +271,27 @@ class BuiltinSum extends Builtin {
     @Override
     Sexp  apply(final Sexp args, final Env env) {
         try {
-            double res = 0;
+            Sexp res = null;
             Pair argl = (Pair) args;
             for (; ; argl = (Pair) argl.rest) {
-                Num  n = (Num) argl.head.eval(env);
-                res += n.val;
+                Sexp nextArg = argl.head.eval(env);
+                if (res == null) {
+                    res = nextArg;
+                }
+                else if (res instanceof Str) {
+                    res = Str.make(((Str)res).val + nextArg.toString(), null);
+                }
+                else if (res instanceof Num) {
+                    if (nextArg instanceof Num)
+                        res = Num.make(((Num)res).val + ((Num)nextArg).val);
+                    else
+                        res = Str.make(((Num)res).val + nextArg.toString(), null);
+                }
 
                 if (argl.rest == NIL)
                     break;
             }
-            return Num.make(res);
+            return res;
         }
         catch (ClassCastException exn) {
             return error("+: bad arg list: ", args);

@@ -306,7 +306,7 @@ class Str extends Atom {
 
     @Override
     void appendTo(Appendable sb) throws IOException {
-        sb.append(val);
+        sb.append('"').append(val).append('"');
     }
 }
 

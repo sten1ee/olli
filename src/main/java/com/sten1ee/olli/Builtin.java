@@ -70,7 +70,7 @@ class BuiltinQuote extends Builtin {
             return argl.head;
         }
         catch (ClassCastException exn) {
-            return error("quote: bad arg list: ", args);
+            return error("quote: bad args: ", args);
         }
     }
 
@@ -92,7 +92,7 @@ class BuiltinSet extends Builtin {
             return lval.set(val);
         }
         catch (ClassCastException exn) {
-            return error("set!: bad arg list: ", args);
+            return error("set!: bad args: ", args);
         }
     }
 }
@@ -109,7 +109,7 @@ class BuiltinDefine extends Builtin {
             return lval.define(val);
         }
         catch (ClassCastException exn) {
-            return error("define: bad arg list: ", args);
+            return error("define: bad args: ", args);
         }
     }
 }
@@ -137,7 +137,7 @@ class BuiltinEq extends Builtin {
             return (x == y ? TRUE : FALSE);
         }
         catch (ClassCastException exn) {
-            return error("eq?: bad arg list: ", args);
+            return error("eq?: bad args: ", args);
         }
     }
 }
@@ -153,7 +153,7 @@ class BuiltinCar extends Builtin {
             return ((Pair)arg).head;
         }
         catch (ClassCastException exn) {
-            return error("car: bad arg list: ", args);
+            return error("car: bad args: ", args);
         }
     }
 
@@ -178,7 +178,7 @@ class BuiltinCar extends Builtin {
             return new Lval((Pair)arg);
         }
         catch (ClassCastException exn) {
-            error("car: bad arg list: ", args);
+            error("car: bad args: ", args);
             return null;
         }
     }
@@ -195,7 +195,7 @@ class BuiltinCdr extends Builtin {
             return ((Pair)arg).rest;
         }
         catch (ClassCastException exn) {
-            return error("cdr: bad arg list: ", args);
+            return error("cdr: bad args: ", args);
         }
     }
 
@@ -220,7 +220,7 @@ class BuiltinCdr extends Builtin {
             return new Lval((Pair)arg);
         }
         catch (ClassCastException exn) {
-            error("cdr: bad arg list: ", args);
+            error("cdr: bad args: ", args);
             return null;
         }
     }
@@ -242,7 +242,7 @@ class BuiltinIf extends Builtin {
             return argl.head.eval(env);
         }
         catch (ClassCastException exn) {
-            return error("if: bad arg list: ", args);
+            return error("if: bad args: ", args);
         }
     }
 
@@ -259,7 +259,7 @@ class BuiltinIf extends Builtin {
             return argl.head.lval(env);
         }
         catch (ClassCastException exn) {
-            error("if: bad arg list: ", args);
+            error("if: bad args: ", args);
             return null;
         }
     }
@@ -270,32 +270,17 @@ class BuiltinSum extends Builtin {
 
     @Override
     Sexp  apply(final Sexp args, final Env env) {
-        try {
-            Sexp res = null;
-            Pair argl = (Pair) args;
-            for (; ; argl = (Pair) argl.rest) {
-                Sexp nextArg = argl.head.eval(env);
-                if (res == null) {
-                    res = nextArg;
-                }
-                else if (res instanceof Str) {
-                    res = Str.make(((Str)res).val + nextArg.toString(), null);
-                }
-                else if (res instanceof Num) {
-                    if (nextArg instanceof Num)
-                        res = Num.make(((Num)res).val + ((Num)nextArg).val);
-                    else
-                        res = Str.make(((Num)res).val + nextArg.toString(), null);
-                }
-
-                if (argl.rest == NIL)
-                    break;
+        double sum = 0;
+        for (Sexp argl = args; argl != NIL; argl = ((Pair) argl).rest) {
+            try {
+                Num arg = (Num) ((Pair) argl).head.eval(env);
+                sum += arg.val;
             }
-            return res;
+            catch (ClassCastException exn) {
+                return error("+: bad args: ", args);
+            }
         }
-        catch (ClassCastException exn) {
-            return error("+: bad arg list: ", args);
-        }
+        return Num.make(sum);
     }
 }
 
@@ -320,7 +305,7 @@ class BuiltinSub extends Builtin {
             return Num.make(argl != args ? res : -res); // As (- x) is negation
         }
         catch (ClassCastException exn) {
-            return error("-: bad arg list: ", args);
+            return error("-: bad args: ", args);
         }
     }
 }
@@ -343,7 +328,7 @@ class BuiltinMul extends Builtin {
             return Num.make(res);
         }
         catch (ClassCastException exn) {
-            return error("*: bad arg list: ", args);
+            return error("*: bad args: ", args);
         }
     }
 }
@@ -369,7 +354,7 @@ class BuiltinDiv extends Builtin {
             return Num.make(argl != args ? res : 1./res); // As (/ x) is reciprocal
         }
         catch (ClassCastException exn) {
-            return error("/: bad arg list: ", args);
+            return error("/: bad args: ", args);
         }
     }
 }
@@ -394,7 +379,7 @@ class BuiltinLess extends Builtin {
             }
         }
         catch (ClassCastException exn) {
-            return error("<: bad arg list: ", args);
+            return error("<: bad args: ", args);
         }
     }
 }
@@ -419,7 +404,7 @@ class BuiltinLessEq extends Builtin {
             }
         }
         catch (ClassCastException exn) {
-            return error("<=: bad arg list: ", args);
+            return error("<=: bad args: ", args);
         }
     }
 }
@@ -444,7 +429,7 @@ class BuiltinGrtr extends Builtin {
             }
         }
         catch (ClassCastException exn) {
-            return error(">: bad arg list: ", args);
+            return error(">: bad args: ", args);
         }
     }
 }
@@ -469,7 +454,7 @@ class BuiltinGrtrEq extends Builtin {
             }
         }
         catch (ClassCastException exn) {
-            return error(">=: bad arg list: ", args);
+            return error(">=: bad args: ", args);
         }
     }
 }
@@ -491,7 +476,7 @@ class BuiltinAnd extends Builtin {
             }
         }
         catch (ClassCastException exn) {
-            return error("and: bad arg list: ", args);
+            return error("and: bad args: ", args);
         }
     }
 }
@@ -513,7 +498,7 @@ class BuiltinOr extends Builtin {
             }
         }
         catch (ClassCastException exn) {
-            return error("and: bad arg list: ", args);
+            return error("and: bad args: ", args);
         }
     }
 }
@@ -530,7 +515,7 @@ class BuiltinNot extends Builtin {
             return (argl.head.eval(env) == FALSE ? TRUE : FALSE);
         }
         catch (ClassCastException exn) {
-            return error("and: bad arg list: ", args);
+            return error("and: bad args: ", args);
         }
     }
 }
@@ -548,7 +533,7 @@ class BuiltinLambda extends Builtin {
             return Closure.make(paramsp.head, bodyp.head, env);
         }
         catch (ClassCastException exn) {
-            return error("lambda: bad arg list: ", args);
+            return error("lambda: bad args: ", args);
         }
     }
 }

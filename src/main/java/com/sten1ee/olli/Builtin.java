@@ -558,15 +558,21 @@ class BuiltinFormat extends Builtin {
                         sb.append(c);
                         continue;
 
-                    case 'd':
-                    case 'i':
-                    case 'f':
+                    case 'd': // decimal integer
+                    case 'i': // decimal integer
+                    case 'f': // float/double
                         argl = (Pair) argl.rest;
-                        double numVal = ((Num) argl.head.eval(env)).val;
+                        double doubleVal = ((Num) argl.head.eval(env)).val;
                         if (c == 'f')
-                            sb.append(numVal);
+                            sb.append(doubleVal);
                         else
-                            sb.append((long) numVal);
+                            sb.append((long) doubleVal);
+                        break;
+
+                    case 'n': // number (may be int or float)
+                        argl = (Pair) argl.rest;
+                        Num numVal = (Num) argl.head.eval(env);
+                        numVal.appendTo(sb);
                         break;
 
                     case 's':

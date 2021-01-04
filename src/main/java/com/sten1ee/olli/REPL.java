@@ -281,7 +281,10 @@ class Num extends Atom {
 
     @Override
     void appendTo(Appendable sb) throws IOException {
-        sb.append(String.valueOf(val));
+        if ((double)(long)val == val)
+            sb.append(String.valueOf((long)val));
+        else
+            sb.append(String.valueOf(val));
     }
 }
 
@@ -650,7 +653,7 @@ class SexpLexer {
         String id = matcher.group();
         Symbol sym;
         if (predefSymbols != null
-         &&(sym = predefSymbols.get(id)) != null) {
+         && (sym = predefSymbols.get(id)) != null) {
             return sym;
         }
         return new Symbol(id, line);
@@ -876,6 +879,11 @@ public class REPL {
 
     public static void  main(String[] args) {
         //testParseAndPrint("(define Pi (+ 1 2.141592 -999.e10 -1a))");
+        /*
+          (define fib (lambda (n) (if (<= n 1) 1 (+ (fib (- n 1)) (fib (- n 2))))))
+          (define describe-fib (lambda (n) (format \"fib(%n) is %n\" n (fib n))))
+          (describe-fib 7)
+        */
         TopEnv topEnv = new TopEnv();
         CharSequence cs = new ReaderCharSequence(new InputStreamReader(System.in));
         SexpParser parser = new SexpParser(cs, PredefSymbol.predefSymbols, System.out);

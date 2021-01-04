@@ -517,6 +517,8 @@ class PredefSymbol extends Symbol {
             OR  = predefine("or",  new BuiltinOr()),
             NOT = predefine("not", new BuiltinNot()),
 
+            FORMAT = predefine("format", new BuiltinFormat()),
+
             NIL   = predefineConst("()"),
             FALSE = predefineConst("#f"),
             TRUE  = predefineConst("#t");

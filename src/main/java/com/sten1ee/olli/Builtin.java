@@ -537,3 +537,53 @@ class BuiltinLambda extends Builtin {
         }
     }
 }
+
+
+class BuiltinFormat extends Builtin {
+
+    @Override
+    Sexp  apply(final Sexp args, final Env env) {
+        try {
+            Pair argl = (Pair) args;
+            String formatStr = ((Str) argl.head).val;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < formatStr.length(); ) {
+                char c = formatStr.charAt(i++);
+                if (c != '%' || i == formatStr.length()) {
+                    sb.append(c);
+                    continue;
+                }
+                switch (c = formatStr.charAt(i++)) {
+                    case '%':
+                        sb.append(c);
+                        continue;
+
+                    case 'd':
+                    case 'i':
+                    case 'f':
+                        argl = (Pair) argl.rest;
+                        double numVal = ((Num) argl.head.eval(env)).val;
+                        if (c == 'f')
+                            sb.append(numVal);
+                        else
+                            sb.append((long) numVal);
+                        break;
+
+                    case 's':
+                        argl = (Pair) argl.rest;
+                        String strVal = ((Str) argl.head.eval(env)).val;
+                        sb.append(strVal);
+                        break;
+
+                    case 'o':
+                    default:
+                        return error("format: bad format char: " + c);
+                }
+            }
+            return Str.make(sb.toString(), null);
+        }
+        catch (ClassCastException exn) {
+            return error("format: bad args: ", args);
+        }
+    }
+}

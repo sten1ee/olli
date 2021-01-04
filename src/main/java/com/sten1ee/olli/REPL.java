@@ -302,6 +302,10 @@ class Str extends Atom {
         return new Str(val, rawVal);
     }
 
+    static Str  make(String val) {
+        return new Str(val, null);
+    }
+
     @Override
     Str eval(Env env) {
         return this;
@@ -805,25 +809,30 @@ class SexpParser extends SexpLexer {
     }
 
     private Sexp  parseObj() {
-        if (tokenType == SYM)
-            return getSymbol();
+        switch (tokenType) {
+            case SYM:
+                return getSymbol();
 
-        if (tokenType == NUM)
-            return getNum();
+            case NUM:
+                return getNum();
 
-        if (tokenType == STR)
-            return getStr();
+            case STR:
+                return getStr();
 
-        if (tokenType == LPA)
-            return parseList();
+            case LPA:
+                return parseList();
 
-        if (tokenType == QUO) {
-            scanNextToken();
-            return new Pair(PredefSymbol.QUOTE, new Pair(parseObj(), NIL));
+            case QUO:
+                scanNextToken();
+                return new Pair(PredefSymbol.QUOTE, new Pair(parseObj(), NIL));
+
+            case EOF:
+                return null;
+
+            default:
+                error("parseObject encountered unexpected tokenType: " + (char)tokenType);
+                return SYNTAX_ERR;
         }
-
-        error("unexpected token while parsing object");
-        return SYNTAX_ERR;
     }
 
     private Sexp  parseList() {
@@ -861,6 +870,9 @@ class SexpParser extends SexpLexer {
         return head;
     }
 
+    /**
+     * @return next token parsed or null if EOF is reached for source
+     */
     public Sexp  parse() {
         scanNextToken();
         return parseObj();
@@ -889,11 +901,13 @@ public class REPL {
         SexpParser parser = new SexpParser(cs, PredefSymbol.predefSymbols, System.out);
 
         System.out.println("Welcome to Olli's Read-Eval-Print-Loop");
-        while (true) {
+        for (;;) {
             try {
                 System.out.print("<< ");
-                Sexp inExp = parser.parse();
-                Sexp resExp = inExp.eval(topEnv);
+                Sexp inputExp = parser.parse();
+                if (inputExp == null)
+                    break;
+                Sexp resExp = inputExp.eval(topEnv);
                 System.out.println("[" + parser.line() +  "] => " + resExp);
             }
             catch (EvalError ee) {

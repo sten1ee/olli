@@ -576,13 +576,21 @@ class BuiltinFormat extends Builtin {
                         break;
 
                     case 'o':
+                        argl = (Pair) argl.rest;
+                        Sexp argVal = argl.head.eval(env);
+                        argVal.appendTo(sb);
+                        break;
+
                     default:
                         return error("format: bad format char: " + c);
                 }
             }
+            if (argl.rest != NIL)
+                return error("format: unused args: ",  argl.rest);
+
             return Str.make(sb.toString(), null);
         }
-        catch (ClassCastException exn) {
+        catch (ClassCastException | IOException exn) {
             return error("format: bad args: ", args);
         }
     }

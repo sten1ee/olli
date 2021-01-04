@@ -59,7 +59,7 @@
                     <manifest>
                         <addClasspath>true</addClasspath>
                         <classpathPrefix>com/sten1ee/bongo-bongo</classpathPrefix>
-                        <mainClass>com.sten1ee.olli.REPL</mainClass>
+                        <mainClass>com.sten1ee.olli.Olli</mainClass>
                     </manifest>
                     </archive>
                 </configuration>

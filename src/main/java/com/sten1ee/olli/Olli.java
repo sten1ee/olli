@@ -879,7 +879,7 @@ class SexpParser extends SexpLexer {
     }
 }
 
-public class REPL {
+public class Olli {
 
     static final String version = "1.0.1";
 
@@ -889,6 +889,37 @@ public class REPL {
         System.out.println(sexp);
     }
 
+    private final Env topEnv;
+    private String prompt = "<< ";
+
+    public Olli(Env topEnv) {
+        this.topEnv = topEnv;
+    }
+
+    public Olli() {
+        this(new TopEnv());
+    }
+
+    public Sexp  repl(CharSequence input, PrintStream out, PrintStream err) {
+        SexpParser parser = new SexpParser(input, PredefSymbol.predefSymbols, err);
+        Sexp resExp = null;
+        for (;;) {
+            try {
+                if (out != null && prompt != null)
+                    out.print("<< ");
+                Sexp inputExp = parser.parse();
+                if (inputExp == null)
+                    return resExp;
+                resExp = inputExp.eval(topEnv);
+                if (out != null)
+                    out.println("[" + parser.line() +  "] => " + resExp);
+            }
+            catch (EvalError ee) {
+                err.println("## " + ee.getMessage());
+            }
+        }
+    }
+
     public static void  main(String[] args) {
         //testParseAndPrint("(define Pi (+ 1 2.141592 -999.e10 -1a))");
         /*
@@ -896,23 +927,9 @@ public class REPL {
           (define describe-fib (lambda (n) (format \"fib(%n) is %n\" n (fib n))))
           (describe-fib 7)
         */
-        TopEnv topEnv = new TopEnv();
-        CharSequence cs = new ReaderCharSequence(new InputStreamReader(System.in));
-        SexpParser parser = new SexpParser(cs, PredefSymbol.predefSymbols, System.out);
 
+        CharSequence input = new ReaderCharSequence(new InputStreamReader(System.in));
         System.out.println("Welcome to Olli's Read-Eval-Print-Loop");
-        for (;;) {
-            try {
-                System.out.print("<< ");
-                Sexp inputExp = parser.parse();
-                if (inputExp == null)
-                    break;
-                Sexp resExp = inputExp.eval(topEnv);
-                System.out.println("[" + parser.line() +  "] => " + resExp);
-            }
-            catch (EvalError ee) {
-                System.out.println("## " + ee.getMessage());
-            }
-        }
+        new Olli().repl(input, System.out, System.err);
     }
 }

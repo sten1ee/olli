@@ -4,6 +4,7 @@ package com.sten1ee.olli;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -517,8 +518,6 @@ class PredefSymbol extends Symbol {
 
             LESS= predefine("<",  new BuiltinLess()),
             LSEQ= predefine("<=", new BuiltinLessEq()),
-            GRTR= predefine(">",  new BuiltinGrtr()),
-            GREQ= predefine(">=", new BuiltinGrtrEq()),
 
             AND = predefine("and", new BuiltinAnd()),
             OR  = predefine("or",  new BuiltinOr()),
@@ -922,10 +921,13 @@ public class Olli {
         }
     }
 
+    public Sexp  repl(Reader input, PrintStream out, PrintStream err) {
+        return repl(new ReaderCharSequence(input), out, err);
+    }
+
     /** Start an Olli REPL */
     public static void  main(String[] args) {
-        CharSequence input = new ReaderCharSequence(new InputStreamReader(System.in));
         System.out.println("Welcome to Olli's Read-Eval-Print-Loop");
-        new Olli().repl(input, System.out, System.err);
+        new Olli().repl(new InputStreamReader(System.in), System.out, System.err);
     }
 }

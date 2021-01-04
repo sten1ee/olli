@@ -366,22 +366,32 @@ class BuiltinLess extends Builtin {
 
     @Override
     Sexp  apply(final Sexp args, final Env env) {
+        Pair xp, yp;
         try {
-            double prev = 0;
-            Pair argl = (Pair) args;
-            for (; ; argl = (Pair) argl.rest) {
-                Num  n = (Num) argl.head.eval(env);
-                if (argl != args && !(prev < n.val))
-                    return FALSE;
-
-                if (argl.rest == NIL)
-                    return TRUE;
-
-                prev = n.val;
-            }
+            xp = (Pair) args;
+            yp = (Pair) xp.rest;
         }
         catch (ClassCastException exn) {
-            return error("<: bad args: ", args);
+            return error("<: less than 2 args: ", args);
+        }
+        if (yp.rest != NIL)
+            return error("<: more than 2 args: ", args);
+
+        Sexp x = xp.head.eval(env);
+        Sexp y = yp.head.eval(env);
+
+        try {
+            if (x instanceof Num)
+                return ((Num)x).val < ((Num)y).val ? TRUE : FALSE;
+            if (x instanceof Symbol)
+                return ((Symbol)x).sym.compareTo(((Symbol)y).sym) < 0 ? TRUE : FALSE;
+            if (x instanceof Str)
+                return ((Str)x).val.compareTo(((Str)y).val) < 0 ? TRUE : FALSE;
+
+            return error("<: bad 1st arg type: ", x);
+        }
+        catch (ClassCastException exn) {
+            return error("<: args type mismatch: ", args);
         }
     }
 }
@@ -391,72 +401,32 @@ class BuiltinLessEq extends Builtin {
 
     @Override
     Sexp  apply(final Sexp args, final Env env) {
+        Pair xp, yp;
         try {
-            double prev = 0;
-            Pair argl = (Pair) args;
-            for (; ; argl = (Pair) argl.rest) {
-                Num  n = (Num) argl.head.eval(env);
-                if (argl != args && !(prev <= n.val))
-                    return FALSE;
-
-                if (argl.rest == NIL)
-                    return TRUE;
-
-                prev = n.val;
-            }
+            xp = (Pair) args;
+            yp = (Pair) xp.rest;
         }
         catch (ClassCastException exn) {
-            return error("<=: bad args: ", args);
+            return error("<=: less than 2 args: ", args);
         }
-    }
-}
+        if (yp.rest != NIL)
+            return error("<=: more than 2 args: ", args);
 
+        Sexp x = xp.head.eval(env);
+        Sexp y = yp.head.eval(env);
 
-class BuiltinGrtr extends Builtin {
-
-    @Override
-    Sexp  apply(final Sexp args, final Env env) {
         try {
-            double prev = 0;
-            Pair argl = (Pair) args;
-            for (; ; argl = (Pair) argl.rest) {
-                Num  n = (Num) argl.head.eval(env);
-                if (argl != args && !(prev > n.val))
-                    return FALSE;
+            if (x instanceof Num)
+                return ((Num)x).val <= ((Num)y).val ? TRUE : FALSE;
+            if (x instanceof Symbol)
+                return ((Symbol)x).sym.compareTo(((Symbol)y).sym) <= 0 ? TRUE : FALSE;
+            if (x instanceof Str)
+                return ((Str)x).val.compareTo(((Str)y).val) <= 0 ? TRUE : FALSE;
 
-                if (argl.rest == NIL)
-                    return TRUE;
-
-                prev = n.val;
-            }
+            return error("<=: bad 1st arg type: ", x);
         }
         catch (ClassCastException exn) {
-            return error(">: bad args: ", args);
-        }
-    }
-}
-
-
-class BuiltinGrtrEq extends Builtin {
-
-    @Override
-    Sexp  apply(final Sexp args, final Env env) {
-        try {
-            double prev = 0;
-            Pair argl = (Pair) args;
-            for (; ; argl = (Pair) argl.rest) {
-                Num  n = (Num) argl.head.eval(env);
-                if (argl != args && !(prev >= n.val))
-                    return FALSE;
-
-                if (argl.rest == NIL)
-                    return TRUE;
-
-                prev = n.val;
-            }
-        }
-        catch (ClassCastException exn) {
-            return error(">=: bad args: ", args);
+            return error("<=: args type mismatch: ", args);
         }
     }
 }

@@ -553,11 +553,11 @@ class TopEnv extends HashMapEnv {
 
 class SexpLexer {
     private static final String  strPattern =
-                       "(-?[0-9]+[.]?[0-9]*([eE][+-]?[0-9]+)?)(?=[ \\t\\n;()])"
-                    +  "|(\"([^\n\"\\\\]|\\\\[^\n])*[\n\"])"
-                    +  "|(?<![0-9])[a-zA-Z_#!?+*/%<>=-][a-zA-Z0-9_#!?+*/%<>=-]*"
-                    +  "|[().'\\n]"     // treat \n as separate token, as Lexer needs them for line counting
-                    +  "|([ \\t]+|;[^\n]*)+"  // (white-space or comment)+
+      /* number */     "(-?[0-9]+[.]?[0-9]*([eE][+-]?[0-9]+)?)(?=[ \t\n;()])"
+      /* string */  +  "|(\"([^\n\"\\\\]|\\\\[^\n])*[\n\"])"
+      /* symbol */  +  "|(?<![0-9])[a-zA-Z_#!?+*/%<>=-][a-zA-Z0-9_#!?+*/%<>=-]*"
+      /* punct. */  +  "|[().'\n]"           // treat \n as separate token, as Lexer needs them for line counting
+      /* w.space*/  +  "|([ \t]+|;[^\n]*)+"  // (white-space or comment)+
                     ;
 
     private static final Pattern pattern = Pattern.compile(strPattern, Pattern.CASE_INSENSITIVE);

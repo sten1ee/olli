@@ -582,7 +582,7 @@ class BuiltinFormat extends Builtin {
                         break;
 
                     default:
-                        return error("format: bad format char: " + c);
+                        return error("format: bad format specifier: %" + c);
                 }
             }
             if (argl.rest != NIL)

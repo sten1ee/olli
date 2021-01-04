@@ -132,6 +132,8 @@ class BuiltinEq extends Builtin {
                 return (y instanceof Num && ((Num)x).val == ((Num)y).val ? TRUE : FALSE);
             if (x instanceof Symbol)
                 return (y instanceof Symbol && ((Symbol)x).sym == ((Symbol)y).sym ? TRUE : FALSE);
+            if (x instanceof Str)
+                return (y instanceof Str && ((Str)x).val.equals(((Str)y).val) ? TRUE : FALSE);
 
             // in all other cases it should have the semantics of same-object?
             return (x == y ? TRUE : FALSE);

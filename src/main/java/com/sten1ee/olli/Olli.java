@@ -90,9 +90,9 @@ abstract class Sexp {
         try {
             appendTo(sb);
         }
-        catch (IOException e) {
-            assert false : "Impossible!";
-            throw new Error(e);
+        catch (IOException exn) {
+            // Should be impossible but ...
+            throw new RuntimeException(exn);
         }
         return sb.toString();
     }
@@ -571,7 +571,7 @@ class SexpLexer {
 
     private final CharSequence  source;
     private final Map<String, ? extends Symbol>  predefSymbols;
-    private final PrintStream  errStream;
+    private final PrintStream   err;
     private Matcher matcher;
             int     tokenType;
     private int     line;
@@ -687,17 +687,18 @@ class SexpLexer {
     }
 
     private void  error(int srcPos, String msg) {
-        errStream.println("## " + location(srcPos) + msg);
+        if (err != null)
+            err.println("## " + location(srcPos) + msg);
     }
 
     protected void  error(String msg) {
         error(tokenBeg, msg);
     }
 
-    protected SexpLexer(CharSequence source, Map<String, ? extends Symbol> predefSymbols, PrintStream errStream) {
+    protected SexpLexer(CharSequence source, Map<String, ? extends Symbol> predefSymbols, PrintStream  err) {
         this.source = source;
         this.predefSymbols = predefSymbols;
-        this.errStream = errStream;
+        this.err = err;
         line = 0;
         matcher = pattern.matcher(source);
     }
@@ -800,12 +801,12 @@ class SexpParser extends SexpLexer {
     final static Sexp NIL = Sexp.NIL;
     final static Symbol SYNTAX_ERR = new Symbol("#SYNTAX_ERROR#", 0);
 
-    public SexpParser(CharSequence source, Map<String, ? extends Symbol> predefSymbols, PrintStream errStream) {
-        super(source, predefSymbols, errStream);
+    public SexpParser(CharSequence source, Map<String, ? extends Symbol> predefSymbols, PrintStream  err) {
+        super(source, predefSymbols,  err);
     }
 
-    public SexpParser(CharSequence source) {
-        super(source, null, System.err);
+    public SexpParser(CharSequence source, PrintStream err) {
+        super(source, PredefSymbol.predefSymbols, System.err);
     }
 
     private Sexp  parseObj() {
@@ -885,7 +886,7 @@ public class Olli {
 
     static void  testParseAndPrint(String source) {
         new SexpLexer(source).listAllTokens(System.err);
-        Sexp sexp = new SexpParser(source).parse();
+        Sexp sexp = new SexpParser(source, System.err).parse();
         System.out.println(sexp);
     }
 
@@ -900,8 +901,8 @@ public class Olli {
         this(new TopEnv());
     }
 
-    public Sexp  repl(CharSequence input, PrintStream out, PrintStream err) {
-        SexpParser parser = new SexpParser(input, PredefSymbol.predefSymbols, err);
+    public Sexp  repl(CharSequence source, PrintStream out, PrintStream err) {
+        SexpParser parser = new SexpParser(source, err);
         Sexp resExp = null;
         for (;;) {
             try {
@@ -915,19 +916,14 @@ public class Olli {
                     out.println("[" + parser.line() +  "] => " + resExp);
             }
             catch (EvalError ee) {
-                err.println("## " + ee.getMessage());
+                if (err != null)
+                    err.println("## " + ee.getMessage());
             }
         }
     }
 
+    /** Start an Olli REPL */
     public static void  main(String[] args) {
-        //testParseAndPrint("(define Pi (+ 1 2.141592 -999.e10 -1a))");
-        /*
-          (define fib (lambda (n) (if (<= n 1) 1 (+ (fib (- n 1)) (fib (- n 2))))))
-          (define describe-fib (lambda (n) (format \"fib(%n) is %n\" n (fib n))))
-          (describe-fib 7)
-        */
-
         CharSequence input = new ReaderCharSequence(new InputStreamReader(System.in));
         System.out.println("Welcome to Olli's Read-Eval-Print-Loop");
         new Olli().repl(input, System.out, System.err);

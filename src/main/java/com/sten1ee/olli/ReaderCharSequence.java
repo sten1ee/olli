@@ -40,8 +40,8 @@ class ReaderCharSequence implements CharSequence {
                 try {
                     nr = rdr.read(buf, 0, Math.min(buf.length, nchars));
                 }
-                catch (IOException e) {
-                    throw new RuntimeException(e);
+                catch (IOException exn) {
+                    throw new RuntimeException(exn);
                 }
                 if (nr > 0) {
                     nchars -= nr;

@@ -3,9 +3,10 @@ package com.sten1ee.olli;
 import java.io.IOException;
 
 /**
- * Builtins;
+ * Builtins
  *
  */
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 abstract class Builtin extends Atom {
 
     @Override
@@ -507,7 +508,7 @@ class BuiltinLambda extends Builtin {
             Pair bodyp = (Pair) paramsp.rest;
             if (bodyp.rest != NIL)
                 throw new ClassCastException();
-            return Closure.make(paramsp.head, bodyp.head, env);
+            return Lambda.make(paramsp.head, bodyp.head, env);
         }
         catch (ClassCastException exn) {
             return error("lambda: bad args: ", args);

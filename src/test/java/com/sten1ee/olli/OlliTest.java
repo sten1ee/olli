@@ -14,6 +14,6 @@ public class OlliTest {
     public void  testInput1() {
         Sexp res = new Olli().repl(input1, System.out, System.err);
         assertTrue(res instanceof Str);
-        assertEquals("fib(7) = 21", ((Str) res).val);
+        assertEquals("fib(7) = 21", ((Str)res).val());
     }
 }

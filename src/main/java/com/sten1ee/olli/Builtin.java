@@ -9,8 +9,13 @@ import java.io.IOException;
 abstract class Builtin extends Atom {
 
     @Override
+    public String val() {
+        return "#" + getClass().getSimpleName();
+    }
+
+    @Override
     void  appendTo(Appendable sb) throws IOException {
-        sb.append('#').append(getClass().getSimpleName());
+        sb.append(val());
     }
 
     @Override

@@ -261,6 +261,7 @@ class HashMapEnv extends Env {
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 abstract class Atom extends Sexp {
+    public abstract Object val();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -273,6 +274,14 @@ class Num extends Atom {
 
     static Num  make(double val) {
         return new Num(val);
+    }
+
+    @Override
+    public Number val() {
+        if ((double)(long)val == val)
+            return (long) val;
+        else
+            return val;
     }
 
     @Override
@@ -308,6 +317,11 @@ class Str extends Atom {
     }
 
     @Override
+    public String val() {
+        return val;
+    }
+
+    @Override
     Str eval(Env env) {
         return this;
     }
@@ -337,6 +351,11 @@ class Symbol extends Atom {
     @Override
     public boolean  equals(Object o) {
         return sym == ((Symbol)o).sym;
+    }
+
+    @Override
+    public String val() {
+        return sym;
     }
 
     @Override
@@ -377,7 +396,12 @@ class Closure extends Atom {
         validateParams(params);
         return new Closure(params, body, env);
     }
-    
+
+    @Override
+    public Closure val() {
+        return this;
+    }
+
     static void  validateParams(final Sexp allParams) {
         try {
             for (Sexp params = allParams; params != NIL; ) {

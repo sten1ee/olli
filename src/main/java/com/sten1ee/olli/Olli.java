@@ -8,17 +8,23 @@ import java.io.Reader;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 public class Olli {
 
-    static final String version = "1.0.1";
-
-    static void  testParseAndPrint(String source) {
-        new SexpLexer(source).listAllTokens(System.err);
-        Sexp sexp = new SexpParser(source, System.err).parse();
-        System.out.println(sexp);
-    }
+    public static final String version = "1.0.1";
 
     private final Env topEnv;
     private String inputPrompt  = "<< ";
     private String outputPrompt = "[${line}] => ";
+
+    public Olli(Env topEnv) {
+        this.topEnv = topEnv;
+    }
+
+    public Olli() {
+        this(new TopEnv());
+    }
+
+    public static Str Str(String val) { return Str.make(val); }
+    public static Num Num(double val) { return Num.make(val); }
+    public static Num Num(int val) { return Num.make(val); }
 
     public Olli inputPrompt(String inputPrompt) {
         this.inputPrompt = inputPrompt;
@@ -28,14 +34,6 @@ public class Olli {
     public Olli outputPrompt(String outputPrompt) {
         this.outputPrompt = outputPrompt;
         return this;
-    }
-
-    public Olli(Env topEnv) {
-        this.topEnv = topEnv;
-    }
-
-    public Olli() {
-        this(new TopEnv());
     }
 
     public Sexp  repl(CharSequence source, PrintStream out, PrintStream err) {
@@ -67,6 +65,12 @@ public class Olli {
 
     public Sexp  repl(Reader input, PrintStream out, PrintStream err) {
         return repl(new ReaderCharSequence(input), out, err);
+    }
+
+    static void  testParseAndPrint(String source) {
+        new SexpLexer(source).listAllTokens(System.err);
+        Sexp sexp = new SexpParser(source, System.err).parse();
+        System.out.println(sexp);
     }
 
     /** Start an Olli REPL */

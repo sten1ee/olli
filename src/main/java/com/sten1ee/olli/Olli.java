@@ -13,6 +13,7 @@ public class Olli {
     private final Env topEnv;
     private String inputPrompt  = "<< ";
     private String outputPrompt = "[${line}] => ";
+    private boolean throwEvalErrors = true;
 
     public Olli(Env topEnv) {
         this.topEnv = topEnv;
@@ -36,7 +37,7 @@ public class Olli {
         return this;
     }
 
-    public Sexp  repl(CharSequence source, PrintStream out, PrintStream err) {
+    public Sexp  repl(CharSequence source, PrintStream out, PrintStream err) throws EvalError {
         SexpParser parser = new SexpParser(source, err);
         Sexp resExp = null;
         for (;;) {
@@ -56,9 +57,11 @@ public class Olli {
                     out.println(resExp);
                 }
             }
-            catch (EvalError ee) {
+            catch (EvalError exn) {
                 if (err != null)
-                    err.println("## " + ee.getMessage());
+                    err.println("## " + exn.getMessage());
+                if (throwEvalErrors)
+                    throw exn;
             }
         }
     }

@@ -22,5 +22,10 @@ public class OlliTest {
         Olli olli = new Olli();
         Sexp res = olli.repl("(define two (+ 1 1))", System.out, System.err);
         assertEquals(Olli.Num(2), res);
+
+        Exception error = assertThrows(EvalError.class, () -> {
+            olli.repl("(define two (- 4 1))", System.out, System.err);
+        });
+        assertEquals("line 1: define on already defined symbol two", error.getMessage());
     }
 }

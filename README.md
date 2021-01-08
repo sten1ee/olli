@@ -3,14 +3,18 @@ Minimalist "Scheme" interpreter coded in Java
 
 ### Build
 To build with Maven:
+
 `mvn clean install`
 
 ### Run
 To start a REPL:
+
 `java -jar target/olli.jar`
 
 ## Available builtins/primitives
-To see the available builtins in the REPL type `(cur-env)`
+To see the available builtins in the REPL type:
+
+`(cur-env)`
 
 ## Sample Olli code:
 You try copy-pasting this valid Olli code in the REPL:

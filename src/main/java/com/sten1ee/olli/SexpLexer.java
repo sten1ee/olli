@@ -20,6 +20,7 @@ class SexpLexer {
     private final CharSequence  source;
     private final Map<String, ? extends Symbol> predefSymbols;
     private final PrintStream errorTo;
+    private boolean throwOnError = true; // on error - throw ParseError instead of logging err msg and recovering
     private Matcher matcher;
             int     tokenType;
     private int     line = 1;
@@ -27,6 +28,10 @@ class SexpLexer {
 
     int  line() {
         return line;
+    }
+
+    void throwOnError(boolean throwOnError) {
+        this.throwOnError = throwOnError;
     }
 
     private String  getRawToken() {
@@ -134,9 +139,11 @@ class SexpLexer {
         return "line " + line + ": ";
     }
 
-    private void  error(int srcPos, String msg) {
+    private void  error(int lineNo, String msg) {
+        if (throwOnError)
+            throw new ParseError(lineNo, msg);
         if (errorTo != null)
-            errorTo.println("## " + location(srcPos) + msg);
+            errorTo.println("## parse error on line " + lineNo + ": " + msg);
     }
 
     void  error(String msg) {

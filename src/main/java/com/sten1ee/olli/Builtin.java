@@ -609,7 +609,7 @@ class BuiltinFormat extends Builtin {
                         break;
 
                     default:
-                        return error("format: bad format specifier: %" + c);
+                        return error("format: bad format specifier: %" + c, ((Str) argl.head));
                 }
             }
             if (argl.rest != NIL)

@@ -1,23 +1,28 @@
 package com.sten1ee.olli;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-public class EvalError extends RuntimeException {
+public class EvalError extends OlliError {
     final Sexp cause;
 
     EvalError(String msg, Sexp cause) {
-        super(location(cause) + msg + cause);
+        super(srcLine(cause), msg + cause);
         this.cause = cause;
     }
 
     EvalError(String msg) {
-        super(msg);
+        super(Atom.NO_SRC_LINE, msg);
         cause = null;
     }
 
-    static String  location(Sexp o) {
+    static int  srcLine(Sexp o) {
         if (o != null && o instanceof Symbol)
-            return "line " + ((Symbol)o).srcLine + ": ";
+            return ((Atom) o).srcLine;
+        else
+            return Atom.NO_SRC_LINE;
+    }
 
-        return "";
+    @Override
+    String errorPrompt() {
+        return "## eval error ";
     }
 }

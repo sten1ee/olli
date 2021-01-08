@@ -39,17 +39,20 @@ public class OlliTest {
                 + "(lambda (f l) (if (null? l) () (cons (f (car l)) (map f (cdr l))))))");
         assertTrue(res instanceof Lambda);
 
-        res = olli.eval("(define square (lambda (x) (* x x))");
+        res = olli.eval("(define square (lambda (x) (* x x)))");
         assertTrue(res instanceof Lambda);
 
         res = olli.eval("(map square '(1 2 3 4 5))");
         assertEquals("(1 4 9 16 25)", res.toString());
 
         res = olli.eval("(define reduce "
-                + "(lambda (f l id) (if (null? l) id (reduce f (cdr l) (f id (car l)))))");
+                + "(lambda (f l id) (if (null? l) id (reduce f (cdr l) (f id (car l))))))");
         assertTrue(res instanceof Lambda);
 
-        res = olli.eval("(reduce + (map square '(1 2 3 4 5)) 0)");
+        res = olli.eval("(define one-to-five '(1 2 3 4 5))");
+        assertEquals("(1 2 3 4 5)", res.toString());
+
+        res = olli.eval("(reduce + (map square one-to-five) 0)");
         assertEquals(Olli.Num(55), res);
     }
 

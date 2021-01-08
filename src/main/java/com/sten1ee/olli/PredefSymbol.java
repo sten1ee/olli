@@ -1,6 +1,6 @@
 package com.sten1ee.olli;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class PredefSymbol extends Symbol {
@@ -23,7 +23,7 @@ class PredefSymbol extends Symbol {
         return null;
     }
 
-    final static HashMap<String, PredefSymbol> predefSymbols = new HashMap<>();
+    final static LinkedHashMap<String, PredefSymbol> predefSymbols = new LinkedHashMap<>();
 
     private static final Symbol l = new Symbol("l", 0);
 

@@ -30,7 +30,6 @@ public class Olli {
      * Makes sense for interactive mode only.
      */
     private PrintStream errorTo = System.err;
-    private String      errorPrompt = "## Error on ";
 
     /**
      * Allow EvalError(s) to escape (i.e. to be thrown out of) Olli.eval() and Olli.repl()
@@ -70,11 +69,6 @@ public class Olli {
         return this;
     }
 
-    public Olli errorPrompt(String errorPrompt) {
-        this.errorPrompt = errorPrompt;
-        return this;
-    }
-
     public Olli errorTo(PrintStream errorTo) {
         this.errorTo = errorTo;
         return this;
@@ -110,9 +104,10 @@ public class Olli {
                     outputTo.println(resExp);
                 }
             }
-            catch (EvalError exn) {
-                if (errorTo != null)
-                    errorTo.println(errorPrompt + exn.getMessage());
+            catch (OlliError exn) {
+                if (errorTo != null) {
+                    errorTo.println(exn.errorPrompt() + exn.getMessage());
+                }
                 if (throwEvalErrors)
                     throw exn;
             }

@@ -13,18 +13,21 @@ public class OlliTest {
 
     @Test
     public void  test_fib7() {
-        Sexp res = new Olli().repl(inputFib7, System.out, System.err);
+        Sexp res = new Olli().eval(inputFib7);
         assertEquals(Olli.Str("fib(7) = 21"), res);
     }
 
     @Test
     public void  test_define() {
         Olli olli = new Olli();
-        Sexp res = olli.repl("(define two (+ 1 1))", System.out, System.err);
+        Sexp res = olli.eval("(define two (+ 1 1))");
+        assertEquals(Olli.Num(2), res);
+
+        res = olli.eval("two");
         assertEquals(Olli.Num(2), res);
 
         Exception error = assertThrows(EvalError.class, () -> {
-            olli.repl("(define two (- 4 1))", System.out, System.err);
+            olli.eval("(define two (- 4 1))");
         });
         assertEquals("line 1: define on already defined symbol two", error.getMessage());
     }

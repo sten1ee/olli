@@ -19,7 +19,7 @@ class SexpLexer {
 
     private final CharSequence  source;
     private final Map<String, ? extends Symbol> predefSymbols;
-    private final PrintStream err;
+    private final PrintStream errorTo;
     private Matcher matcher;
             int     tokenType;
     private int     line = 1;
@@ -135,8 +135,8 @@ class SexpLexer {
     }
 
     private void  error(int srcPos, String msg) {
-        if (err != null)
-            err.println("## " + location(srcPos) + msg);
+        if (errorTo != null)
+            errorTo.println("## " + location(srcPos) + msg);
     }
 
     void  error(String msg) {
@@ -146,7 +146,7 @@ class SexpLexer {
     SexpLexer(CharSequence source, Map<String, ? extends Symbol> predefSymbols, PrintStream err) {
         this.source = source;
         this.predefSymbols = predefSymbols;
-        this.err = err;
+        this.errorTo = err;
         matcher = pattern.matcher(source);
     }
 

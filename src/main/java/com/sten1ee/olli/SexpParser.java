@@ -13,7 +13,7 @@ public class SexpParser extends SexpLexer {
     }
 
     public SexpParser(CharSequence source, PrintStream err) {
-        super(source, PredefSymbol.predefSymbols, System.err);
+        super(source, PredefSymbol.predefSymbols, err);
     }
 
     private Sexp  parseObj() {

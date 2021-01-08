@@ -6,12 +6,13 @@ import java.io.IOException;
 public class Num extends Atom {
     final double val;
 
-    private Num(double val) {
+    private Num(double val, int srcLine) {
+        super(srcLine);
         this.val = val;
     }
 
-    static Num  make(double val) {
-        return new Num(val);
+    static Num  make(double val, int srcLine) {
+        return new Num(val, srcLine);
     }
 
     @Override

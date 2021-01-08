@@ -7,17 +7,18 @@ public class Str extends Atom {
     final String val;
     final String rawVal; // non-null for Str literals
 
-    private Str(String val, String rawVal) {
+    private Str(String val, String rawVal, int srcLine) {
+        super(srcLine);
         this.val = val;
         this.rawVal = rawVal;
     }
 
-    static Str  make(String val, String rawVal) {
-        return new Str(val, rawVal);
+    static Str  make(String val, String rawVal, int srcLine) {
+        return new Str(val, rawVal, srcLine);
     }
 
-    static Str  make(String val) {
-        return new Str(val, null);
+    public static Str  make(String val) {
+        return new Str(val, null, NO_SRC_LINE);
     }
 
     @Override

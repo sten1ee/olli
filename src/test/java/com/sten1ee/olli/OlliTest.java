@@ -29,6 +29,14 @@ public class OlliTest {
         Exception error = assertThrows(EvalError.class, () -> {
             olli.eval("(define two (- 4 1))");
         });
-        assertEquals("line 1: define on already defined symbol two", error.getMessage());
+        assertEquals("line 1: define on defined symbol two", error.getMessage());
     }
+
+    @Test
+    public void  test_higher_order_functions() {
+        Olli olli = new Olli();
+        Sexp res = olli.eval("(define map (lambda (f l) (if (null? l) () (cons (f (car l)) (map f (cdr l))))))");
+        assertEquals("<lambda:#anon>", ((Atom)res).val());
+    }
+
 }

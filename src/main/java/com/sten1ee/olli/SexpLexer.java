@@ -35,7 +35,7 @@ class SexpLexer {
 
     Num  getNum() {
         assert tokenType == NUM : (char)tokenType;
-        return Num.make(Double.parseDouble(matcher.group()));
+        return Num.make(Double.parseDouble(matcher.group()), line);
     }
 
     Str  getStr() {
@@ -51,7 +51,7 @@ class SexpLexer {
 
         String rawVal = rawToken.substring(1, rawToken.length() - 1);
         String val = rawValToVal(rawVal);
-        return Str.make(val, rawVal);
+        return Str.make(val, rawVal, line);
     }
 
     private String  rawValToVal(String rawVal) {

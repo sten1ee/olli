@@ -6,11 +6,10 @@ import java.io.IOException;
 public class Symbol extends Atom {
     final String sym;
     final int    sym_hash;
-    final int    srcLine;
 
     Symbol(String sym, int srcLine) {
+        super(srcLine);
         this.sym_hash = (this.sym = sym.intern()).hashCode();
-        this.srcLine = srcLine;
     }
 
     @Override

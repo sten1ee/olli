@@ -4,19 +4,26 @@ import java.io.IOException;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 public class Lambda extends Atom {
+    /**
+     * Name of the Lambda if it was created through (define (f (x y) ...)
+     * Or symbol 'anonymous' if this is anonymous lambda
+     */
+    final Symbol name;
     final Env  env;
     final Sexp params;
     final Sexp body;
 
-    private Lambda(Sexp params, Sexp body, Env env) {
+    private Lambda(Symbol name, Sexp params, Sexp body, Env env) {
+        super(name.srcLine);
+        this.name = name;
         this.params = params;
         this.body = body;
         this.env = env;
     }
 
-    static Lambda make(Sexp params, Sexp body, Env env) {
+    static Lambda make(Symbol name, Sexp params, Sexp body, Env env) {
         validateParams(params);
-        return new Lambda(params, body, env);
+        return new Lambda(name, params, body, env);
     }
 
     @Override
@@ -113,6 +120,6 @@ public class Lambda extends Atom {
 
     @Override
     void appendTo(Appendable sb) throws IOException {
-        sb.append("#Lambda");
+        sb.append("<lambda:" + name.sym + ">");
     }
 }

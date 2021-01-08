@@ -49,7 +49,7 @@ class HashMapEnv extends Env {
         Sexp define(Sexp val) {
             if (localDefine(sym, val))
                 return val;
-            return error("define on already defined symbol ", sym);
+            return error("define on defined symbol ", sym);
         }
     }
 

@@ -27,13 +27,20 @@ class PredefSymbol extends Symbol {
 
     private static final Symbol l = new Symbol("l", 0);
 
+    public static final Symbol
+            NIL   = predefineConst("()"),
+            FALSE = predefineConst("#f"),
+            TRUE  = predefineConst("#t"),
+            ANON = predefineConst("#anon");
+
     public static final Sexp
             DEFINE = predefine("define", new BuiltinDefine()),
             CAR = predefine("car", new BuiltinCar()),
             CDR = predefine("cdr", new BuiltinCdr()),
             EVAL= predefine("eval",new BuiltinEval()),
-            LIST= predefine("list", Lambda.make(l, l, null)),
+            LIST= predefine("list", Lambda.make(ANON, l, l, null)),
             EQ  = predefine("eq?", new BuiltinEq()),
+            NULL  = predefine("null?", new BuiltinNull()),
             IF  = predefine("if", new BuiltinIf()),
             QUOTE=predefine("quote", new BuiltinQuote()),
             SET = predefine("set!", new BuiltinSet()),
@@ -53,18 +60,14 @@ class PredefSymbol extends Symbol {
             OR  = predefine("or",  new BuiltinOr()),
             NOT = predefine("not", new BuiltinNot()),
 
-            FORMAT = predefine("format", new BuiltinFormat()),
-
-            NIL   = predefineConst("()"),
-            FALSE = predefineConst("#f"),
-            TRUE  = predefineConst("#t");
+            FORMAT = predefine("format", new BuiltinFormat());
 
 
     private final static Sexp predefine(String id, Sexp val) {
         return  new PredefSymbol(id, val).val;
     }
 
-    private final static Sexp predefineConst(String id) {
+    private final static Symbol predefineConst(String id) {
         return new PredefSymbol(id, null);
     }
 }

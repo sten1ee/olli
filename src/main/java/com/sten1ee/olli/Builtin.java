@@ -9,6 +9,10 @@ import java.io.IOException;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 abstract class Builtin extends Atom {
 
+    Builtin() {
+        super(NO_SRC_LINE); // no srcLine
+    }
+
     @Override
     public String val() {
         return "#" + getClass().getSimpleName();
@@ -151,6 +155,23 @@ class BuiltinEq extends Builtin {
 }
 
 
+class BuiltinNull extends Builtin {
+    @Override
+    Sexp apply(Sexp args, Env env) {
+        try {
+            Pair argl = (Pair) args;
+            if (argl.rest != NIL)
+                throw new ClassCastException();
+            Sexp arg = argl.head.eval(env);
+            return arg == NIL ? TRUE : FALSE;
+        }
+        catch (ClassCastException exn) {
+            return error("null?: bad args: ", args);
+        }
+    }
+}
+
+
 class BuiltinCar extends Builtin {
 
     @Override
@@ -288,7 +309,7 @@ class BuiltinSum extends Builtin {
                 return error("+: bad args: ", args);
             }
         }
-        return Num.make(sum);
+        return Num.make(sum, NO_SRC_LINE);
     }
 }
 
@@ -310,7 +331,7 @@ class BuiltinSub extends Builtin {
                 if (argl.rest == NIL)
                     break;
             }
-            return Num.make(argl != args ? res : -res); // As (- x) is negation
+            return Num.make(argl != args ? res : -res, NO_SRC_LINE); // As (- x) is negation
         }
         catch (ClassCastException exn) {
             return error("-: bad args: ", args);
@@ -333,7 +354,7 @@ class BuiltinMul extends Builtin {
                 if (argl.rest == NIL)
                     break;
             }
-            return Num.make(res);
+            return Num.make(res, NO_SRC_LINE);
         }
         catch (ClassCastException exn) {
             return error("*: bad args: ", args);
@@ -359,7 +380,7 @@ class BuiltinDiv extends Builtin {
                 if (argl.rest == NIL)
                     break;
             }
-            return Num.make(argl != args ? res : 1./res); // As (/ x) is reciprocal
+            return Num.make(argl != args ? res : 1./res, NO_SRC_LINE); // As (/ x) is reciprocal
         }
         catch (ClassCastException exn) {
             return error("/: bad args: ", args);
@@ -508,7 +529,7 @@ class BuiltinLambda extends Builtin {
             Pair bodyp = (Pair) paramsp.rest;
             if (bodyp.rest != NIL)
                 throw new ClassCastException();
-            return Lambda.make(paramsp.head, bodyp.head, env);
+            return Lambda.make(PredefSymbol.ANON, paramsp.head, bodyp.head, env);
         }
         catch (ClassCastException exn) {
             return error("lambda: bad args: ", args);
@@ -572,7 +593,7 @@ class BuiltinFormat extends Builtin {
             if (argl.rest != NIL)
                 return error("format: unused args: ",  argl.rest);
 
-            return Str.make(sb.toString(), null);
+            return Str.make(sb.toString(), null, NO_SRC_LINE);
         }
         catch (ClassCastException | IOException exn) {
             return error("format: bad args: ", args);

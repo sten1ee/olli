@@ -30,7 +30,7 @@ public class Olli {
      * Makes sense for interactive mode only.
      */
     private PrintStream errorTo = System.err;
-    private String      errorPrompt = "## Error at ";
+    private String      errorPrompt = "## Error on ";
 
     /**
      * Allow EvalError(s) to escape (i.e. to be thrown out of) Olli.eval() and Olli.repl()
@@ -47,8 +47,8 @@ public class Olli {
     }
 
     public static Str Str(String val) { return Str.make(val); }
-    public static Num Num(double val) { return Num.make(val); }
-    public static Num Num(int val) { return Num.make(val); }
+    public static Num Num(double val) { return Num.make(val, Atom.NO_SRC_LINE); }
+    public static Num Num(int val) { return Num.make(val, Atom.NO_SRC_LINE); }
 
     public Olli inputPrompt(String inputPrompt) {
         this.inputPrompt = inputPrompt;
@@ -120,7 +120,10 @@ public class Olli {
     }
 
     public Sexp  repl(Reader input, PrintStream out, PrintStream err) {
-        return outputTo(out).errorTo(err).eval(new ReaderCharSequence(input));
+        return this.outputTo(out)
+                   .errorTo(err)
+                   .throwEvalErrors(false)
+                   .eval(new ReaderCharSequence(input));
     }
 
     static void  testParseAndPrint(String source) {

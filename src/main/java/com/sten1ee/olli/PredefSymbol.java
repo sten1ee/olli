@@ -37,6 +37,7 @@ class PredefSymbol extends Symbol {
             DEFINE = predefine("define", new BuiltinDefine()),
             CAR = predefine("car", new BuiltinCar()),
             CDR = predefine("cdr", new BuiltinCdr()),
+            CONS = predefine("cons", new BuiltinCons()),
             EVAL= predefine("eval",new BuiltinEval()),
             LIST= predefine("list", Lambda.make(ANON, l, l, null)),
             EQ  = predefine("eq?", new BuiltinEq()),

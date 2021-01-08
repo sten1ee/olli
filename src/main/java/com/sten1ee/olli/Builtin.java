@@ -172,6 +172,28 @@ class BuiltinNull extends Builtin {
 }
 
 
+class BuiltinCons extends Builtin {
+
+    @Override
+    Sexp apply(Sexp args, Env env) {
+        try {
+            Pair xp = (Pair) args;
+            Pair yp = (Pair) xp.rest;
+            if (yp.rest != NIL)
+                throw new ClassCastException();
+
+            Sexp car = xp.head.eval(env);
+            Sexp cdr = yp.head.eval(env);
+
+            return new Pair(car, cdr);
+        }
+        catch (ClassCastException exn) {
+            return error("cons: bad args: ", args);
+        }
+    }
+}
+
+
 class BuiltinCar extends Builtin {
 
     @Override

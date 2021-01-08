@@ -1,12 +1,12 @@
 package com.sten1ee.olli;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class HashMapEnv extends Env {
-    private HashMap<Symbol, Sexp> symbolMap = new HashMap<>();
+    private LinkedHashMap<Symbol, Sexp> symbolMap = new LinkedHashMap<>();
 
     HashMapEnv(Env parentEnv) {
         super(parentEnv);

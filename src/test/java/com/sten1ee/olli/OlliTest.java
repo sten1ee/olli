@@ -52,4 +52,24 @@ public class OlliTest {
         res = olli.eval("(reduce + (map square '(1 2 3 4 5)) 0)");
         assertEquals(Olli.Num(55), res);
     }
+
+    @Test
+    public void test_weird_lvals_and_vals() {
+        Olli olli = new Olli();
+        Sexp res = olli.eval("(define a (new-env))");
+        assertTrue(res instanceof Env);
+
+        assertEquals(Olli.Num(10), olli.eval("(define (a.x) 10)"));
+        assertEquals("{x: 10}", olli.eval("a").toString());
+        assertEquals(Olli.Num(20), olli.eval("(a define y 20)"));
+        assertEquals("{x: 10, y: 20}", olli.eval("a").toString());
+        assertEquals(Olli.Num(30), olli.eval("(define (a.z) (+ (a.x) (a.y)))"));
+        assertEquals("{x: 10, y: 20, z: 30}", olli.eval("a").toString());
+        assertEquals(Olli.Num(40), olli.eval("(a define c 40)"));
+        assertEquals("{x: 10, y: 20, z: 30, c: 40}", olli.eval("a").toString());
+
+        assertEquals(Olli.Num(30), olli.eval("(+ (a.x) (a.y))"));
+        assertEquals(Olli.Num(30), olli.eval("(a + x y)"));
+        assertEquals(Olli.Num(30), olli.eval("(a.(+ x y))"));
+    }
 }

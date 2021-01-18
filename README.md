@@ -29,4 +29,6 @@ You try copy-pasting this valid Olli code in the REPL:
 
 (define reduce (lambda (f l id) (if (null? l) id (reduce f (cdr l) (f id (car l))))))
 (reduce + (map square '(1 2 3 4 5)) 0)
+
+(define append (lambda (l m) (if (null? l) m (cons (car l) (append (cdr l) m)))))
 ```

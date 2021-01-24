@@ -15,7 +15,7 @@ public class EvalError extends OlliError {
     }
 
     static int  srcLine(Sexp o) {
-        if (o != null && o instanceof Symbol)
+        if (o instanceof Symbol)
             return ((Atom) o).srcLine;
         else
             return Atom.NO_SRC_LINE;

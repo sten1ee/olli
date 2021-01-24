@@ -19,7 +19,8 @@ public class Symbol extends Atom {
 
     @Override
     public boolean  equals(Object o) {
-        return sym == ((Symbol)o).sym;
+        return o instanceof Symbol
+            && sym == ((Symbol)o).sym;
     }
 
     @Override
